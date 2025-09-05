@@ -2,11 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Portfolio Design System - Professional & Modern */
+
 @layer base {
   :root {
-    
+    /* Core colors - Professional purple/blue theme */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+    
+    /* Brand colors */
+    --brand-primary: 250 84% 54%;
+    --brand-secondary: 270 91% 65%;
+    --brand-accent: 310 83% 47%;
+    
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--brand-primary) / 0.05), hsl(var(--brand-secondary) / 0.1));
+    --gradient-accent: linear-gradient(90deg, hsl(var(--brand-accent)), hsl(var(--brand-secondary)));
+    
+    /* Shadows */
+    --shadow-card: 0 10px 30px -10px hsl(var(--brand-primary) / 0.1);
+    --shadow-hero: 0 20px 40px -10px hsl(var(--brand-primary) / 0.2);
+    --shadow-hover: 0 15px 35px -5px hsl(var(--brand-primary) / 0.15);
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -22,7 +39,7 @@
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    
+
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
@@ -51,7 +68,7 @@
 
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-  
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -98,5 +115,45 @@
 
   body {
     @apply bg-background text-foreground scroll-smooth;
+  }
+}
+
+@layer components {
+  /* Portfolio-specific components */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
+  }
+  
+  .accent-gradient {
+    background: var(--gradient-accent);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-hero {
+    box-shadow: var(--shadow-hero);
+  }
+  
+  .shadow-hover {
+    box-shadow: var(--shadow-hover);
+  }
+  
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: hsl(var(--background) / 0.8);
+    border: 1px solid hsl(var(--brand-primary) / 0.1);
+  }
+  
+  .portfolio-text-gradient {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
