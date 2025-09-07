@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
+  const { user, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -52,13 +55,38 @@ const Navigation = () => {
                 {item.label}
               </button>
             ))}
-            <Button 
-              size="sm" 
-              className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300"
-              onClick={() => scrollToSection('contact')}
-            >
-              Hire Me
-            </Button>
+            
+            {user ? (
+              <Button 
+                onClick={signOut}
+                variant="outline" 
+                size="sm"
+                className="shadow-card hover:shadow-hover transition-all duration-300"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            ) : (
+              <>
+                <Link to="/admin">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="shadow-card hover:shadow-hover transition-all duration-300"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
+                <Button 
+                  size="sm" 
+                  className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300"
+                  onClick={() => scrollToSection('contact')}
+                >
+                  Hire Me
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -85,14 +113,38 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
-              <div className="px-4 pt-2">
-                <Button 
-                  size="sm" 
-                  className="w-full hero-gradient text-white shadow-card"
-                  onClick={() => scrollToSection('contact')}
-                >
-                  Hire Me
-                </Button>
+              <div className="px-4 pt-2 space-y-2">
+                {user ? (
+                  <Button 
+                    onClick={signOut}
+                    variant="outline"
+                    size="sm"
+                    className="w-full shadow-card hover:shadow-hover transition-all duration-300"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                ) : (
+                  <>
+                    <Link to="/admin" className="block">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="w-full shadow-card hover:shadow-hover transition-all duration-300"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        Admin
+                      </Button>
+                    </Link>
+                    <Button 
+                      size="sm" 
+                      className="w-full hero-gradient text-white shadow-card"
+                      onClick={() => scrollToSection('contact')}
+                    >
+                      Hire Me
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>

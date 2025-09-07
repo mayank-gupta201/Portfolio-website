@@ -1,110 +1,157 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Github, Upload, Plus } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
-const Projects = () => {
-  const projects = [
-    {
-      id: 1,
-      title: "E-Commerce Platform",
-      description: "A full-stack e-commerce solution with modern UI and secure payment processing.",
-      technologies: ["React", "Node.js", "PostgreSQL", "Stripe"],
-      image: "/placeholder.svg",
-      github: "#",
-      demo: "#"
-    },
-    {
-      id: 2,
-      title: "Task Management App",
-      description: "Collaborative task management tool with real-time updates and team features.",
-      technologies: ["TypeScript", "Supabase", "Tailwind"],
-      image: "/placeholder.svg",
-      github: "#",
-      demo: "#"
-    },
-    {
-      id: 3,
-      title: "Portfolio Website",
-      description: "A responsive portfolio website showcasing creative design and smooth animations.",
-      technologies: ["React", "Framer Motion", "Tailwind"],
-      image: "/placeholder.svg",
-      github: "#",
-      demo: "#"
-    }
+const Navigation = () => {
+  const { user, signOut } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    setIsMobileMenuOpen(false);
+  };
+
+  const navItems = [
+    { label: 'About', section: 'about' },
+    { label: 'Projects', section: 'projects' },
+    { label: 'DSA', section: 'dsa' },
+    { label: 'Certificates', section: 'certificates' },
+    { label: 'Contact', section: 'contact' }
   ];
 
   return (
-    <section id="projects" className="py-20">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled ? 'glass-effect shadow-card' : 'bg-transparent'
+    }`}>
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            My <span className="portfolio-text-gradient">Projects</span>
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Here are some of my featured projects that showcase my skills and passion for development.
-          </p>
-          
-          {/* Upload new project button */}
-          <Button className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300">
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Project
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <button 
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="text-2xl font-bold portfolio-text-gradient"
+          >
+            Portfolio
+          </button>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navItems.map((item) => (
+              <button
+                key={item.section}
+                onClick={() => scrollToSection(item.section)}
+                className="text-muted-foreground hover:text-brand-primary transition-colors duration-200"
+              >
+                {item.label}
+              </button>
+            ))}
+            
+            {user ? (
+              <Button 
+                onClick={signOut}
+                variant="outline" 
+                size="sm"
+                className="shadow-card hover:shadow-hover transition-all duration-300"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            ) : (
+              <>
+                <Link to="/admin">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="shadow-card hover:shadow-hover transition-all duration-300"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
+                <Button 
+                  size="sm" 
+                  className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300"
+                  onClick={() => scrollToSection('contact')}
+                >
+                  Hire Me
+                </Button>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <Card key={project.id} className="group overflow-hidden shadow-card hover:shadow-hover transition-all duration-300 border-0">
-              <div className="aspect-video bg-muted relative overflow-hidden">
-                <img 
-                  src={project.image} 
-                  alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                {/* Action buttons */}
-                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button size="sm" variant="secondary" className="glass-effect">
-                    <Github className="w-4 h-4" />
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-background/95 backdrop-blur-sm border-t border-border">
+            <div className="py-4 space-y-2">
+              {navItems.map((item) => (
+                <button
+                  key={item.section}
+                  onClick={() => scrollToSection(item.section)}
+                  className="block w-full text-left px-4 py-2 text-muted-foreground hover:text-brand-primary transition-colors duration-200"
+                >
+                  {item.label}
+                </button>
+              ))}
+              <div className="px-4 pt-2 space-y-2">
+                {user ? (
+                  <Button 
+                    onClick={signOut}
+                    variant="outline"
+                    size="sm"
+                    className="w-full shadow-card hover:shadow-hover transition-all duration-300"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
                   </Button>
-                  <Button size="sm" variant="secondary" className="glass-effect">
-                    <ExternalLink className="w-4 h-4" />
-                  </Button>
-                </div>
+                ) : (
+                  <>
+                    <Link to="/admin" className="block">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="w-full shadow-card hover:shadow-hover transition-all duration-300"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        Admin
+                      </Button>
+                    </Link>
+                    <Button 
+                      size="sm" 
+                      className="w-full hero-gradient text-white shadow-card"
+                      onClick={() => scrollToSection('contact')}
+                    >
+                      Hire Me
+                    </Button>
+                  </>
+                )}
               </div>
-              
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{project.title}</h3>
-                <p className="text-muted-foreground mb-4 line-clamp-2">
-                  {project.description}
-                </p>
-                
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.map((tech) => (
-                    <Badge key={tech} variant="secondary" className="text-xs">
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          
-          {/* Add project card */}
-          <Card className="group border-2 border-dashed border-muted hover:border-brand-primary transition-colors duration-300 cursor-pointer">
-            <CardContent className="p-6 h-full flex flex-col items-center justify-center text-center min-h-[300px]">
-              <Upload className="w-12 h-12 text-muted-foreground group-hover:text-brand-primary transition-colors duration-300 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Upload New Project</h3>
-              <p className="text-muted-foreground text-sm">
-                Click to add a new project to your portfolio
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </div>
+        )}
       </div>
-    </section>
+    </nav>
   );
 };
 
-export default Projects;
+export default Navigation;
