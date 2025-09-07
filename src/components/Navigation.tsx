@@ -22,6 +22,7 @@ const Navigation = () => {
   const navItems = [
     { label: 'About', section: 'about' },
     { label: 'Projects', section: 'projects' },
+    { label: 'DSA', section: 'dsa' },
     { label: 'Certificates', section: 'certificates' },
     { label: 'Contact', section: 'contact' }
   ];
