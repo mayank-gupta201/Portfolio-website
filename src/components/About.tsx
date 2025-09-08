@@ -1,4 +1,78 @@
+import { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/contexts/AuthContext';
+import { Camera, Edit2, Save, X, Plus } from 'lucide-react';
+
 const About = () => {
+  const { profile, loading, updateProfile, uploadAvatar } = useProfile();
+  const { user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingSkills, setEditingSkills] = useState<{
+    frontend: string[];
+    backend: string[];
+  }>({ frontend: [], backend: [] });
+  const [newSkill, setNewSkill] = useState({ frontend: '', backend: '' });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && user) {
+      try {
+        await uploadAvatar(file);
+      } catch (error) {
+        console.error('Upload failed:', error);
+      }
+    }
+  };
+
+  const handleEditSkills = () => {
+    setEditingSkills({
+      frontend: profile?.frontend_skills || ['React & TypeScript', 'Next.js', 'Tailwind CSS'],
+      backend: profile?.backend_skills || ['Node.js', 'Python', 'PostgreSQL'],
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveSkills = async () => {
+    if (user) {
+      try {
+        await updateProfile({
+          frontend_skills: editingSkills.frontend,
+          backend_skills: editingSkills.backend,
+        });
+        setIsEditing(false);
+      } catch (error) {
+        console.error('Failed to save skills:', error);
+      }
+    }
+  };
+
+  const addSkill = (type: 'frontend' | 'backend') => {
+    const skill = newSkill[type].trim();
+    if (skill) {
+      setEditingSkills(prev => ({
+        ...prev,
+        [type]: [...prev[type], skill]
+      }));
+      setNewSkill(prev => ({ ...prev, [type]: '' }));
+    }
+  };
+
+  const removeSkill = (type: 'frontend' | 'backend', index: number) => {
+    setEditingSkills(prev => ({
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index)
+    }));
+  };
+
+  const displayName = profile?.display_name || "Mayank Gupta";
+  const frontendSkills = profile?.frontend_skills?.length ? profile.frontend_skills : ['React & TypeScript', 'Next.js', 'Tailwind CSS'];
+  const backendSkills = profile?.backend_skills?.length ? profile.backend_skills : ['Node.js', 'Python', 'PostgreSQL'];
+
   return (
     <section id="about" className="py-20 bg-muted/30">
       <div className="container mx-auto px-6">
@@ -10,9 +84,7 @@ const About = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                I'm a passionate developer with expertise in modern web technologies. 
-                I love creating beautiful, functional applications that solve real-world problems 
-                and provide exceptional user experiences.
+                {profile?.bio || "I'm a passionate developer with expertise in modern web technologies. I love creating beautiful, functional applications that solve real-world problems and provide exceptional user experiences."}
               </p>
               
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
@@ -22,33 +94,145 @@ const About = () => {
               
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold text-brand-primary mb-2">Frontend</h3>
-                  <ul className="space-y-1 text-muted-foreground">
-                    <li>React & TypeScript</li>
-                    <li>Next.js</li>
-                    <li>Tailwind CSS</li>
-                  </ul>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-brand-primary">Frontend</h3>
+                    {user && !isEditing && (
+                      <Button size="sm" variant="ghost" onClick={handleEditSkills}>
+                        <Edit2 className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      {editingSkills.frontend.map((skill, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {skill}
+                            <X 
+                              className="w-3 h-3 ml-1 cursor-pointer" 
+                              onClick={() => removeSkill('frontend', index)}
+                            />
+                          </Badge>
+                        </div>
+                      ))}
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder="Add skill"
+                          value={newSkill.frontend}
+                          onChange={(e) => setNewSkill(prev => ({ ...prev, frontend: e.target.value }))}
+                          onKeyPress={(e) => e.key === 'Enter' && addSkill('frontend')}
+                        />
+                        <Button size="sm" onClick={() => addSkill('frontend')}>
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <ul className="space-y-1 text-muted-foreground">
+                      {frontendSkills.map((skill, index) => (
+                        <li key={index}>{skill}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-brand-primary mb-2">Backend</h3>
-                  <ul className="space-y-1 text-muted-foreground">
-                    <li>Node.js</li>
-                    <li>Python</li>
-                    <li>PostgreSQL</li>
-                  </ul>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-brand-primary">Backend</h3>
+                  </div>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      {editingSkills.backend.map((skill, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {skill}
+                            <X 
+                              className="w-3 h-3 ml-1 cursor-pointer" 
+                              onClick={() => removeSkill('backend', index)}
+                            />
+                          </Badge>
+                        </div>
+                      ))}
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder="Add skill"
+                          value={newSkill.backend}
+                          onChange={(e) => setNewSkill(prev => ({ ...prev, backend: e.target.value }))}
+                          onKeyPress={(e) => e.key === 'Enter' && addSkill('backend')}
+                        />
+                        <Button size="sm" onClick={() => addSkill('backend')}>
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <ul className="space-y-1 text-muted-foreground">
+                      {backendSkills.map((skill, index) => (
+                        <li key={index}>{skill}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
+
+              {isEditing && (
+                <div className="flex gap-2 mt-4">
+                  <Button onClick={handleSaveSkills} size="sm">
+                    <Save className="w-4 h-4 mr-1" />
+                    Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsEditing(false)} size="sm">
+                    Cancel
+                  </Button>
+                </div>
+              )}
             </div>
             
             <div className="relative">
-              <div className="aspect-square rounded-2xl card-gradient shadow-card p-8 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-24 h-24 bg-brand-primary rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-white">JD</span>
+              <Card className="shadow-card border-0">
+                <CardContent className="p-8">
+                  <div className="text-center">
+                    <div className="relative inline-block">
+                      {profile?.avatar_url ? (
+                        <img 
+                          src={profile.avatar_url} 
+                          alt={displayName}
+                          className="w-32 h-32 rounded-full object-cover mx-auto mb-4"
+                        />
+                      ) : (
+                        <div className="w-32 h-32 bg-brand-primary rounded-full mx-auto mb-4 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-white">
+                            {displayName.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {user && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="absolute -bottom-1 -right-1 rounded-full w-10 h-10 p-0"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            <Camera className="w-4 h-4" />
+                          </Button>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                        </>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{displayName}</h3>
+                    <p className="text-muted-foreground">
+                      {profile?.location || "Gwalior, M.P., India"}
+                    </p>
                   </div>
-                  <p className="text-muted-foreground">Profile image placeholder</p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
