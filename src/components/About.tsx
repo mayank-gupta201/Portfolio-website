@@ -138,6 +138,11 @@ const About = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-semibold text-brand-primary">Backend</h3>
+                    {user && !isEditing && (
+                      <Button size="sm" variant="ghost" onClick={handleEditSkills}>
+                        <Edit2 className="w-3 h-3" />
+                      </Button>
+                    )}
                   </div>
                   {isEditing ? (
                     <div className="space-y-2">
