@@ -2,37 +2,41 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Award, Upload, Plus, ExternalLink } from "lucide-react";
+import { useCertificates } from "@/hooks/useCertificates";
+import { CertificateForm } from "@/components/forms/CertificateForm";
 
 const Certificates = () => {
-  const certificates = [
-    {
-      id: 1,
-      title: "AWS Certified Developer",
-      issuer: "Amazon Web Services",
-      date: "2024",
-      credentialId: "AWS-DEV-2024-001",
-      image: "/placeholder.svg",
-      verificationUrl: "#"
-    },
-    {
-      id: 2,
-      title: "React Developer Certification",
-      issuer: "Meta",
-      date: "2023",
-      credentialId: "META-REACT-2023-456",
-      image: "/placeholder.svg",
-      verificationUrl: "#"
-    },
-    {
-      id: 3,
-      title: "Full Stack Web Development",
-      issuer: "freeCodeCamp",
-      date: "2023",
-      credentialId: "FCC-FULLSTACK-789",
-      image: "/placeholder.svg",
-      verificationUrl: "#"
-    }
-  ];
+  const { data: certificates = [], isLoading, error } = useCertificates();
+
+  if (isLoading) {
+    return (
+      <section id="certificates" className="py-20 bg-muted/30">
+        <div className="container mx-auto px-6">
+          <div className="text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="portfolio-text-gradient">Certificates</span> & Achievements
+            </h2>
+            <p className="text-muted-foreground">Loading certificates...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="certificates" className="py-20 bg-muted/30">
+        <div className="container mx-auto px-6">
+          <div className="text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="portfolio-text-gradient">Certificates</span> & Achievements
+            </h2>
+            <p className="text-destructive">Error loading certificates</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="certificates" className="py-20 bg-muted/30">
@@ -45,10 +49,7 @@ const Certificates = () => {
             Professional certifications and achievements that validate my expertise and commitment to continuous learning.
           </p>
           
-          <Button className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300">
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Certificate
-          </Button>
+          <CertificateForm />
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -76,17 +77,31 @@ const Certificates = () => {
                     </p>
                   </div>
                   
-                  <div className="text-xs text-muted-foreground">
-                    ID: {certificate.credentialId}
-                  </div>
+                  {certificate.credential_id && (
+                    <div className="text-xs text-muted-foreground">
+                      ID: {certificate.credential_id}
+                    </div>
+                  )}
                 </div>
                 
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <Button size="sm" variant="secondary" className="glass-effect">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Verify
-                  </Button>
+                  {certificate.verification_url ? (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="glass-effect"
+                      onClick={() => window.open(certificate.verification_url, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Verify
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="secondary" className="glass-effect" disabled>
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Verify
+                    </Button>
+                  )}
                 </div>
               </div>
               
@@ -95,9 +110,11 @@ const Certificates = () => {
                 <p className="text-muted-foreground text-sm mb-3">
                   Issued by {certificate.issuer} • {certificate.date}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  Credential ID: {certificate.credentialId}
-                </p>
+                {certificate.credential_id && (
+                  <p className="text-xs text-muted-foreground">
+                    Credential ID: {certificate.credential_id}
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}

@@ -53,6 +53,57 @@ export type Database = {
         }
         Relationships: []
       }
+      dsa_problems: {
+        Row: {
+          category: string
+          created_at: string
+          difficulty: string
+          id: string
+          notes: string | null
+          platform: string
+          problem_url: string | null
+          solution_url: string | null
+          solved: boolean
+          space_complexity: string
+          time_complexity: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          difficulty: string
+          id?: string
+          notes?: string | null
+          platform: string
+          problem_url?: string | null
+          solution_url?: string | null
+          solved?: boolean
+          space_complexity: string
+          time_complexity: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          difficulty?: string
+          id?: string
+          notes?: string | null
+          platform?: string
+          problem_url?: string | null
+          solution_url?: string | null
+          solved?: boolean
+          space_complexity?: string
+          time_complexity?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string
