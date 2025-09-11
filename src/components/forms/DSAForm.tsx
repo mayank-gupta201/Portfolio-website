@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useCreateDSAProblem } from '@/hooks/useDSAProblems';
+import { useCreateDSAProblem, useUpdateDSAProblem, type DSAProblem } from '@/hooks/useDSAProblems';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -31,11 +31,13 @@ type DSAFormValues = z.infer<typeof dsaSchema>;
 interface DSAFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editingProblem?: DSAProblem | null;
 }
 
-export default function DSAForm({ open, onOpenChange }: DSAFormProps) {
+export default function DSAForm({ open, onOpenChange, editingProblem }: DSAFormProps) {
   const { user } = useAuth();
   const createDSAProblem = useCreateDSAProblem();
+  const updateDSAProblem = useUpdateDSAProblem();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<DSAFormValues>({
@@ -54,32 +56,83 @@ export default function DSAForm({ open, onOpenChange }: DSAFormProps) {
     },
   });
 
+  // Reset form when editing problem changes
+  useEffect(() => {
+    if (editingProblem) {
+      form.reset({
+        title: editingProblem.title,
+        platform: editingProblem.platform,
+        difficulty: editingProblem.difficulty,
+        category: editingProblem.category,
+        time_complexity: editingProblem.time_complexity,
+        space_complexity: editingProblem.space_complexity,
+        problem_url: editingProblem.problem_url || '',
+        solution_url: editingProblem.solution_url || '',
+        notes: editingProblem.notes || '',
+        solved: editingProblem.solved,
+      });
+    } else {
+      form.reset({
+        title: '',
+        platform: '',
+        difficulty: 'Easy',
+        category: '',
+        time_complexity: '',
+        space_complexity: '',
+        problem_url: '',
+        solution_url: '',
+        notes: '',
+        solved: false,
+      });
+    }
+  }, [editingProblem, form]);
+
   const onSubmit = async (values: DSAFormValues) => {
     if (!user) {
-      toast.error('You must be logged in to add DSA problems');
+      toast.error('You must be logged in to manage DSA problems');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await createDSAProblem.mutateAsync({
-        title: values.title,
-        platform: values.platform,
-        difficulty: values.difficulty,
-        category: values.category,
-        time_complexity: values.time_complexity,
-        space_complexity: values.space_complexity,
-        problem_url: values.problem_url || undefined,
-        solution_url: values.solution_url || undefined,
-        notes: values.notes || undefined,
-        solved: values.solved,
-      });
+      if (editingProblem) {
+        // Update existing problem
+        await updateDSAProblem.mutateAsync({
+          id: editingProblem.id,
+          updates: {
+            title: values.title,
+            platform: values.platform,
+            difficulty: values.difficulty,
+            category: values.category,
+            time_complexity: values.time_complexity,
+            space_complexity: values.space_complexity,
+            problem_url: values.problem_url || undefined,
+            solution_url: values.solution_url || undefined,
+            notes: values.notes || undefined,
+            solved: values.solved,
+          },
+        });
+      } else {
+        // Create new problem
+        await createDSAProblem.mutateAsync({
+          title: values.title,
+          platform: values.platform,
+          difficulty: values.difficulty,
+          category: values.category,
+          time_complexity: values.time_complexity,
+          space_complexity: values.space_complexity,
+          problem_url: values.problem_url || undefined,
+          solution_url: values.solution_url || undefined,
+          notes: values.notes || undefined,
+          solved: values.solved,
+        });
+      }
       
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error adding DSA problem:', error);
+      console.error('Error saving DSA problem:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -89,7 +142,9 @@ export default function DSAForm({ open, onOpenChange }: DSAFormProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add DSA Problem</DialogTitle>
+          <DialogTitle>
+            {editingProblem ? 'Edit DSA Problem' : 'Add DSA Problem'}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -266,7 +321,10 @@ export default function DSAForm({ open, onOpenChange }: DSAFormProps) {
                 type="submit" 
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Adding...' : 'Add Problem'}
+                {isSubmitting 
+                  ? (editingProblem ? 'Updating...' : 'Adding...') 
+                  : (editingProblem ? 'Update Problem' : 'Add Problem')
+                }
               </Button>
             </div>
           </form>

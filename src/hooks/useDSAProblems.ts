@@ -62,3 +62,52 @@ export const useCreateDSAProblem = () => {
     },
   });
 };
+
+export const useUpdateDSAProblem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Omit<DSAProblem, 'id' | 'user_id' | 'created_at' | 'updated_at'>> }) => {
+      const { data, error } = await supabase
+        .from('dsa_problems')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dsa-problems'] });
+      toast.success('DSA problem updated successfully!');
+    },
+    onError: (error) => {
+      console.error('Error updating DSA problem:', error);
+      toast.error('Failed to update DSA problem');
+    },
+  });
+};
+
+export const useDeleteDSAProblem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('dsa_problems')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dsa-problems'] });
+      toast.success('DSA problem deleted successfully!');
+    },
+    onError: (error) => {
+      console.error('Error deleting DSA problem:', error);
+      toast.error('Failed to delete DSA problem');
+    },
+  });
+};

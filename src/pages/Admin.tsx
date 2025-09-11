@@ -13,6 +13,7 @@ import { ProjectForm } from '@/components/forms/ProjectForm';
 import { ProfileForm } from '@/components/forms/ProfileForm';
 import CertificatesManager from '@/components/admin/CertificatesManager';
 import DSAForm from '@/components/forms/DSAForm';
+import DSAManager from '@/components/admin/DSAManager';
 
 const Admin = () => {
   const { user, signUp, signIn, signOut, loading } = useAuth();
@@ -207,12 +208,23 @@ const Admin = () => {
                 <CardContent>
                   <Button 
                     onClick={() => setDsaFormOpen(true)}
-                    className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300"
+                    className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300 mb-6"
                   >
                     <Code className="w-4 h-4 mr-2" />
                     Add New DSA Problem
                   </Button>
                   <DSAForm open={dsaFormOpen} onOpenChange={setDsaFormOpen} />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Manage DSA Problems</CardTitle>
+                  <CardDescription>
+                    View, edit, and delete your existing DSA problems
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DSAManager />
                 </CardContent>
               </Card>
             </TabsContent>
