@@ -50,7 +50,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const ADMIN_EMAIL = 'gupta.mayank201@gmail.com';
+  const ADMIN_PASSWORD = 'Mayank2001';
+
   const signUp = async (email: string, password: string) => {
+    // Only allow admin email to sign up
+    if (email !== ADMIN_EMAIL) {
+      return { error: { message: 'Access denied. Only admin can create an account.' } };
+    }
+
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -64,6 +72,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signIn = async (email: string, password: string) => {
+    // Only allow admin credentials
+    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+      return { error: { message: 'Invalid admin credentials.' } };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
