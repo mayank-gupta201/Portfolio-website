@@ -95,3 +95,65 @@ export const useUploadCertificateImage = () => {
     },
   });
 };
+
+export const useUpdateCertificate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Omit<Certificate, 'id' | 'user_id' | 'created_at' | 'updated_at'>> }) => {
+      const { data, error } = await supabase
+        .from('certificates')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['certificates'] });
+      toast({
+        title: 'Updated',
+        description: 'Certificate updated successfully.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update certificate',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+export const useDeleteCertificate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('certificates')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['certificates'] });
+      toast({
+        title: 'Deleted',
+        description: 'Certificate deleted successfully.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to delete certificate',
+        variant: 'destructive',
+      });
+    },
+  });
+};

@@ -1,9 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Award, Upload, Plus, ExternalLink } from "lucide-react";
+import { Award, ExternalLink } from "lucide-react";
 import { useCertificates } from "@/hooks/useCertificates";
-import { CertificateForm } from "@/components/forms/CertificateForm";
 
 const Certificates = () => {
   const { data: certificates = [], isLoading, error } = useCertificates();
@@ -45,11 +44,9 @@ const Certificates = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="portfolio-text-gradient">Certificates</span> & Achievements
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Professional certifications and achievements that validate my expertise and commitment to continuous learning.
           </p>
-          
-          <CertificateForm />
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -118,17 +115,6 @@ const Certificates = () => {
               </CardContent>
             </Card>
           ))}
-          
-          {/* Add certificate card */}
-          <Card className="group border-2 border-dashed border-muted hover:border-brand-primary transition-colors duration-300 cursor-pointer">
-            <CardContent className="p-6 h-full flex flex-col items-center justify-center text-center min-h-[300px]">
-              <Upload className="w-12 h-12 text-muted-foreground group-hover:text-brand-primary transition-colors duration-300 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Upload Certificate</h3>
-              <p className="text-muted-foreground text-sm">
-                Add your achievements and certifications
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </section>

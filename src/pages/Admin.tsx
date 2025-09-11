@@ -7,7 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Eye, EyeOff, LogOut } from 'lucide-react';
+import { Eye, EyeOff, LogOut, Award, FolderOpen, User, Code } from 'lucide-react';
+import { CertificateForm } from '@/components/forms/CertificateForm';
+import { ProjectForm } from '@/components/forms/ProjectForm';
+import { ProfileForm } from '@/components/forms/ProfileForm';
+import CertificatesManager from '@/components/admin/CertificatesManager';
+import DSAForm from '@/components/forms/DSAForm';
 
 const Admin = () => {
   const { user, signUp, signIn, signOut, loading } = useAuth();
@@ -15,11 +20,7 @@ const Admin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Redirect authenticated users to home
-  if (user && !loading) {
-    return <Navigate to="/" replace />;
-  }
+  const [dsaFormOpen, setDsaFormOpen] = useState(false);
 
   // Show loading spinner while checking auth state
   if (loading) {
@@ -108,25 +109,114 @@ const Admin = () => {
   if (user) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-6 py-20">
-          <Card className="max-w-md mx-auto shadow-card">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Admin Panel</CardTitle>
-              <CardDescription>
-                Welcome, {user.email}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button 
-                onClick={handleSignOut}
-                variant="outline" 
-                className="w-full"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="container mx-auto px-6 py-8">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold portfolio-text-gradient">Portfolio Admin</h1>
+              <p className="text-muted-foreground">Welcome, {user.email}</p>
+            </div>
+            <Button onClick={handleSignOut} variant="outline">
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+
+          {/* Management Tabs */}
+          <Tabs defaultValue="certificates" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="certificates" className="flex items-center gap-2">
+                <Award className="w-4 h-4" />
+                Certificates
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="flex items-center gap-2">
+                <FolderOpen className="w-4 h-4" />
+                Projects
+              </TabsTrigger>
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Profile
+              </TabsTrigger>
+              <TabsTrigger value="dsa" className="flex items-center gap-2">
+                <Code className="w-4 h-4" />
+                DSA Problems
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="certificates" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Add Certificate</CardTitle>
+                  <CardDescription>
+                    Upload a new certificate to showcase your achievements
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CertificateForm />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Manage Certificates</CardTitle>
+                  <CardDescription>
+                    View, edit, and delete your existing certificates
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CertificatesManager />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="projects" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Management</CardTitle>
+                  <CardDescription>
+                    Add and showcase your projects
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ProjectForm />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="profile" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Management</CardTitle>
+                  <CardDescription>
+                    Update your profile information and skills
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ProfileForm />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="dsa" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>DSA Problems Management</CardTitle>
+                  <CardDescription>
+                    Track your coding practice and problem-solving progress
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => setDsaFormOpen(true)}
+                    className="hero-gradient text-white shadow-card hover:shadow-hover transition-all duration-300"
+                  >
+                    <Code className="w-4 h-4 mr-2" />
+                    Add New DSA Problem
+                  </Button>
+                  <DSAForm open={dsaFormOpen} onOpenChange={setDsaFormOpen} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     );

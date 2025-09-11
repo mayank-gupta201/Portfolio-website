@@ -109,10 +109,13 @@ export const CertificateForm = () => {
           Add New Certificate
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="add-certificate-description">
         <Card>
           <CardHeader>
             <CardTitle>Add New Certificate</CardTitle>
+            <div id="add-certificate-description" className="text-sm text-muted-foreground">
+              Upload a new certificate to showcase your professional achievements
+            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
