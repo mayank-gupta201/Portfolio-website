@@ -12,6 +12,7 @@ import { CertificateForm } from '@/components/forms/CertificateForm';
 import { ProjectForm } from '@/components/forms/ProjectForm';
 import { ProfileForm } from '@/components/forms/ProfileForm';
 import CertificatesManager from '@/components/admin/CertificatesManager';
+import ProjectsManager from '@/components/admin/ProjectsManager';
 import DSAForm from '@/components/forms/DSAForm';
 import DSAManager from '@/components/admin/DSAManager';
 
@@ -172,13 +173,24 @@ const Admin = () => {
             <TabsContent value="projects" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Project Management</CardTitle>
+                  <CardTitle>Add Project</CardTitle>
                   <CardDescription>
-                    Add and showcase your projects
+                    Add a new project to showcase your work
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ProjectForm />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Manage Projects</CardTitle>
+                  <CardDescription>
+                    View, edit, and delete your existing projects
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ProjectsManager />
                 </CardContent>
               </Card>
             </TabsContent>

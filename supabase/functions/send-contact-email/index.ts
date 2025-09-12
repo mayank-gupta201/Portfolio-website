@@ -38,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email to you (the portfolio owner)
     const emailToOwner = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
-      to: ["mayankgoyal3005@gmail.com"], // Your email
+      to: ["gupta.mayank201@gmail.com"], // Your verified email
       subject: `Portfolio Contact: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
