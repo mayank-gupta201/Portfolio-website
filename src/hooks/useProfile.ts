@@ -26,14 +26,15 @@ export const useProfile = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  const fetchProfile = async () => {
-    if (!user) return;
+  const fetchProfile = async (userId?: string) => {
+    // If no user is provided, try to get from auth context, or use the portfolio owner's ID
+    const targetUserId = userId || user?.id || '0fef7352-c624-4a9b-8ff2-bf12f24fabc7';
     
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .maybeSingle();
 
       if (error) {
@@ -53,16 +54,39 @@ export const useProfile = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // First check if profile exists
+      const { data: existingProfile } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
-          ...updates,
-        })
-        .select()
-        .single();
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      let data;
+      if (existingProfile) {
+        // Update existing profile
+        const { data: updatedData, error } = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('user_id', user.id)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        data = updatedData;
+      } else {
+        // Insert new profile
+        const { data: insertedData, error } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            ...updates,
+          })
+          .select()
+          .single();
+        
+        if (error) throw error;
+        data = insertedData;
+      }
 
       setProfile(data);
       toast.success('Profile updated successfully');
@@ -133,11 +157,15 @@ export const useProfile = () => {
     fetchProfile();
   }, [user]);
 
+  // Expose fetchProfile function to allow fetching specific user profiles
+  const fetchUserProfile = (userId: string) => fetchProfile(userId);
+
   return {
     profile,
     loading,
     updateProfile,
     uploadAvatar,
     refetch: fetchProfile,
+    fetchUserProfile,
   };
 };
