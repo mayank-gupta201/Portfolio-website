@@ -14,8 +14,9 @@ const About = () => {
   const [editingSkills, setEditingSkills] = useState<{
     frontend: string[];
     backend: string[];
-  }>({ frontend: [], backend: [] });
-  const [newSkill, setNewSkill] = useState({ frontend: '', backend: '' });
+    other: string[];
+  }>({ frontend: [], backend: [], other: [] });
+  const [newSkill, setNewSkill] = useState({ frontend: '', backend: '', other: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,6 +34,7 @@ const About = () => {
     setEditingSkills({
       frontend: profile?.frontend_skills || ['React & TypeScript', 'Next.js', 'Tailwind CSS'],
       backend: profile?.backend_skills || ['Node.js', 'Python', 'PostgreSQL'],
+      other: profile?.other_skills || ['Git & GitHub', 'Docker', 'AWS'],
     });
     setIsEditing(true);
   };
@@ -43,6 +45,7 @@ const About = () => {
         await updateProfile({
           frontend_skills: editingSkills.frontend,
           backend_skills: editingSkills.backend,
+          other_skills: editingSkills.other,
         });
         setIsEditing(false);
       } catch (error) {
@@ -51,7 +54,7 @@ const About = () => {
     }
   };
 
-  const addSkill = (type: 'frontend' | 'backend') => {
+  const addSkill = (type: 'frontend' | 'backend' | 'other') => {
     const skill = newSkill[type].trim();
     if (skill) {
       setEditingSkills(prev => ({
@@ -62,7 +65,7 @@ const About = () => {
     }
   };
 
-  const removeSkill = (type: 'frontend' | 'backend', index: number) => {
+  const removeSkill = (type: 'frontend' | 'backend' | 'other', index: number) => {
     setEditingSkills(prev => ({
       ...prev,
       [type]: prev[type].filter((_, i) => i !== index)
@@ -72,6 +75,7 @@ const About = () => {
   const displayName = profile?.display_name || "Mayank Gupta";
   const frontendSkills = profile?.frontend_skills?.length ? profile.frontend_skills : ['React & TypeScript', 'Next.js', 'Tailwind CSS'];
   const backendSkills = profile?.backend_skills?.length ? profile.backend_skills : ['Node.js', 'Python', 'PostgreSQL'];
+  const otherSkills = profile?.other_skills?.length ? profile.other_skills : ['Git & GitHub', 'Docker', 'AWS'];
 
   return (
     <section id="about" className="py-20 bg-muted/30">
@@ -92,7 +96,7 @@ const About = () => {
                 I bring ideas to life through clean, efficient code and thoughtful design.
               </p>
               
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-3 gap-6">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-semibold text-brand-primary">Frontend</h3>
@@ -172,6 +176,48 @@ const About = () => {
                   ) : (
                     <ul className="space-y-1 text-muted-foreground">
                       {backendSkills.map((skill, index) => (
+                        <li key={index}>{skill}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-brand-primary">Other Skills</h3>
+                    {user && !isEditing && (
+                      <Button size="sm" variant="ghost" onClick={handleEditSkills}>
+                        <Edit2 className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      {editingSkills.other.map((skill, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {skill}
+                            <X 
+                              className="w-3 h-3 ml-1 cursor-pointer" 
+                              onClick={() => removeSkill('other', index)}
+                            />
+                          </Badge>
+                        </div>
+                      ))}
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder="Add skill"
+                          value={newSkill.other}
+                          onChange={(e) => setNewSkill(prev => ({ ...prev, other: e.target.value }))}
+                          onKeyPress={(e) => e.key === 'Enter' && addSkill('other')}
+                        />
+                        <Button size="sm" onClick={() => addSkill('other')}>
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <ul className="space-y-1 text-muted-foreground">
+                      {otherSkills.map((skill, index) => (
                         <li key={index}>{skill}</li>
                       ))}
                     </ul>

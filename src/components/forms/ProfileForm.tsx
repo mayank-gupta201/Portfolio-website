@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -31,8 +31,10 @@ export const ProfileForm = () => {
   const { profile, updateProfile, uploadAvatar } = useProfile();
   const [frontendSkills, setFrontendSkills] = useState<string[]>(profile?.frontend_skills || ['React & TypeScript', 'Next.js', 'Tailwind CSS']);
   const [backendSkills, setBackendSkills] = useState<string[]>(profile?.backend_skills || ['Node.js', 'Python', 'PostgreSQL']);
+  const [otherSkills, setOtherSkills] = useState<string[]>(profile?.other_skills || ['Git & GitHub', 'Docker', 'AWS']);
   const [newFrontendSkill, setNewFrontendSkill] = useState('');
   const [newBackendSkill, setNewBackendSkill] = useState('');
+  const [newOtherSkill, setNewOtherSkill] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,12 +52,31 @@ export const ProfileForm = () => {
     },
   });
 
+  // Keep form and skills in sync with latest profile data
+  useEffect(() => {
+    setFrontendSkills(profile?.frontend_skills || ['React & TypeScript', 'Next.js', 'Tailwind CSS']);
+    setBackendSkills(profile?.backend_skills || ['Node.js', 'Python', 'PostgreSQL']);
+    setOtherSkills(profile?.other_skills || ['Git & GitHub', 'Docker', 'AWS']);
+
+    form.reset({
+      display_name: profile?.display_name || 'Mayank Gupta',
+      bio: profile?.bio || "I'm a passionate developer with expertise in modern web technologies. I love creating beautiful, functional applications that solve real-world problems and provide exceptional user experiences.",
+      location: profile?.location || 'Gwalior, M.P., India',
+      email: profile?.email || 'mayankgoyal3005@gmail.com',
+      phone: profile?.phone || '+919098488654',
+      github_url: profile?.github_url || 'https://github.com/mayank-gupta201',
+      linkedin_url: profile?.linkedin_url || 'https://www.linkedin.com/in/mayank-gupta-8151bb273/',
+      leetcode_url: profile?.leetcode_url || 'https://leetcode.com/u/mayank_gupta201/',
+    });
+  }, [profile]);
+
   const onSubmit = async (data: ProfileFormData) => {
     try {
       await updateProfile({
         ...data,
         frontend_skills: frontendSkills,
         backend_skills: backendSkills,
+        other_skills: otherSkills,
       });
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -106,6 +127,17 @@ export const ProfileForm = () => {
 
   const removeBackendSkill = (skill: string) => {
     setBackendSkills(backendSkills.filter(s => s !== skill));
+  };
+
+  const addOtherSkill = () => {
+    if (newOtherSkill.trim() && !otherSkills.includes(newOtherSkill.trim())) {
+      setOtherSkills([...otherSkills, newOtherSkill.trim()]);
+      setNewOtherSkill('');
+    }
+  };
+
+  const removeOtherSkill = (skill: string) => {
+    setOtherSkills(otherSkills.filter(s => s !== skill));
   };
 
   if (!user) {
@@ -326,6 +358,32 @@ export const ProfileForm = () => {
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBackendSkill())}
                     />
                     <Button type="button" size="sm" onClick={addBackendSkill}>
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-brand-primary mb-2">Other Skills</h3>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {otherSkills.map(skill => (
+                      <Badge key={skill} variant="secondary" className="flex items-center gap-1">
+                        {skill}
+                        <X 
+                          className="w-3 h-3 cursor-pointer hover:text-destructive" 
+                          onClick={() => removeOtherSkill(skill)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newOtherSkill}
+                      onChange={(e) => setNewOtherSkill(e.target.value)}
+                      placeholder="Add other skill"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addOtherSkill())}
+                    />
+                    <Button type="button" size="sm" onClick={addOtherSkill}>
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>

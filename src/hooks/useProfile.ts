@@ -17,6 +17,7 @@ export interface Profile {
   avatar_url: string | null;
   frontend_skills: string[];
   backend_skills: string[];
+  other_skills: string[];
   created_at: string;
   updated_at: string;
 }
@@ -155,6 +156,31 @@ export const useProfile = () => {
 
   useEffect(() => {
     fetchProfile();
+  }, [user]);
+
+  // Realtime subscription to profile changes so UI updates instantly
+  useEffect(() => {
+    const targetUserId = user?.id || '0fef7352-c624-4a9b-8ff2-bf12f24fabc7';
+
+    const channel = supabase
+      .channel(`profiles_changes_${targetUserId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles',
+        filter: `user_id=eq.${targetUserId}`,
+      }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          setProfile(null);
+        } else {
+          setProfile(payload.new as Profile);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   // Expose fetchProfile function to allow fetching specific user profiles

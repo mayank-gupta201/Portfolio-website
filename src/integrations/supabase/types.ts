@@ -118,6 +118,7 @@ export type Database = {
           leetcode_url: string | null
           linkedin_url: string | null
           location: string | null
+          other_skills: string[] | null
           phone: string | null
           updated_at: string
           user_id: string
@@ -135,6 +136,7 @@ export type Database = {
           leetcode_url?: string | null
           linkedin_url?: string | null
           location?: string | null
+          other_skills?: string[] | null
           phone?: string | null
           updated_at?: string
           user_id: string
@@ -152,6 +154,7 @@ export type Database = {
           leetcode_url?: string | null
           linkedin_url?: string | null
           location?: string | null
+          other_skills?: string[] | null
           phone?: string | null
           updated_at?: string
           user_id?: string
