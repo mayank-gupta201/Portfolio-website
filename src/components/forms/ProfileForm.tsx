@@ -32,9 +32,13 @@ export const ProfileForm = () => {
   const [frontendSkills, setFrontendSkills] = useState<string[]>(profile?.frontend_skills || ['React & TypeScript', 'Next.js', 'Tailwind CSS']);
   const [backendSkills, setBackendSkills] = useState<string[]>(profile?.backend_skills || ['Node.js', 'Python', 'PostgreSQL']);
   const [otherSkills, setOtherSkills] = useState<string[]>(profile?.other_skills || ['Git & GitHub', 'Docker', 'AWS']);
+  const [currentlyLearning, setCurrentlyLearning] = useState<string[]>(profile?.currently_learning || ['Machine Learning', 'TypeScript Advanced Patterns']);
+  const [currentlyWorking, setCurrentlyWorking] = useState<string[]>(profile?.currently_working || ['Portfolio Website', 'E-commerce Platform']);
   const [newFrontendSkill, setNewFrontendSkill] = useState('');
   const [newBackendSkill, setNewBackendSkill] = useState('');
   const [newOtherSkill, setNewOtherSkill] = useState('');
+  const [newCurrentlyLearning, setNewCurrentlyLearning] = useState('');
+  const [newCurrentlyWorking, setNewCurrentlyWorking] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -57,6 +61,8 @@ export const ProfileForm = () => {
     setFrontendSkills(profile?.frontend_skills || ['React & TypeScript', 'Next.js', 'Tailwind CSS']);
     setBackendSkills(profile?.backend_skills || ['Node.js', 'Python', 'PostgreSQL']);
     setOtherSkills(profile?.other_skills || ['Git & GitHub', 'Docker', 'AWS']);
+    setCurrentlyLearning(profile?.currently_learning || ['Machine Learning', 'TypeScript Advanced Patterns']);
+    setCurrentlyWorking(profile?.currently_working || ['Portfolio Website', 'E-commerce Platform']);
 
     form.reset({
       display_name: profile?.display_name || 'Mayank Gupta',
@@ -77,6 +83,8 @@ export const ProfileForm = () => {
         frontend_skills: frontendSkills,
         backend_skills: backendSkills,
         other_skills: otherSkills,
+        currently_learning: currentlyLearning,
+        currently_working: currentlyWorking,
       });
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -138,6 +146,28 @@ export const ProfileForm = () => {
 
   const removeOtherSkill = (skill: string) => {
     setOtherSkills(otherSkills.filter(s => s !== skill));
+  };
+
+  const addCurrentlyLearning = () => {
+    if (newCurrentlyLearning.trim() && !currentlyLearning.includes(newCurrentlyLearning.trim())) {
+      setCurrentlyLearning([...currentlyLearning, newCurrentlyLearning.trim()]);
+      setNewCurrentlyLearning('');
+    }
+  };
+
+  const removeCurrentlyLearning = (item: string) => {
+    setCurrentlyLearning(currentlyLearning.filter(s => s !== item));
+  };
+
+  const addCurrentlyWorking = () => {
+    if (newCurrentlyWorking.trim() && !currentlyWorking.includes(newCurrentlyWorking.trim())) {
+      setCurrentlyWorking([...currentlyWorking, newCurrentlyWorking.trim()]);
+      setNewCurrentlyWorking('');
+    }
+  };
+
+  const removeCurrentlyWorking = (item: string) => {
+    setCurrentlyWorking(currentlyWorking.filter(s => s !== item));
   };
 
   if (!user) {
@@ -386,8 +416,60 @@ export const ProfileForm = () => {
                     <Button type="button" size="sm" onClick={addOtherSkill}>
                       <Plus className="w-4 h-4" />
                     </Button>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-brand-primary mb-2">Currently Learning</h3>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {currentlyLearning.map(item => (
+                      <Badge key={item} variant="secondary" className="flex items-center gap-1">
+                        {item}
+                        <X 
+                          className="w-3 h-3 cursor-pointer hover:text-destructive" 
+                          onClick={() => removeCurrentlyLearning(item)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newCurrentlyLearning}
+                      onChange={(e) => setNewCurrentlyLearning(e.target.value)}
+                      placeholder="Add what you're learning"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCurrentlyLearning())}
+                    />
+                    <Button type="button" size="sm" onClick={addCurrentlyLearning}>
+                      <Plus className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
+
+                <div>
+                  <h3 className="font-semibold text-brand-primary mb-2">Currently Working On</h3>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {currentlyWorking.map(item => (
+                      <Badge key={item} variant="secondary" className="flex items-center gap-1">
+                        {item}
+                        <X 
+                          className="w-3 h-3 cursor-pointer hover:text-destructive" 
+                          onClick={() => removeCurrentlyWorking(item)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newCurrentlyWorking}
+                      onChange={(e) => setNewCurrentlyWorking(e.target.value)}
+                      placeholder="Add what you're working on"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCurrentlyWorking())}
+                    />
+                    <Button type="button" size="sm" onClick={addCurrentlyWorking}>
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
               </div>
 
               <Button type="submit" className="w-full hero-gradient text-white">

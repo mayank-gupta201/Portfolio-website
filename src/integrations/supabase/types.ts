@@ -110,6 +110,8 @@ export type Database = {
           backend_skills: string[] | null
           bio: string | null
           created_at: string
+          currently_learning: string[] | null
+          currently_working: string[] | null
           display_name: string | null
           email: string | null
           frontend_skills: string[] | null
@@ -128,6 +130,8 @@ export type Database = {
           backend_skills?: string[] | null
           bio?: string | null
           created_at?: string
+          currently_learning?: string[] | null
+          currently_working?: string[] | null
           display_name?: string | null
           email?: string | null
           frontend_skills?: string[] | null
@@ -146,6 +150,8 @@ export type Database = {
           backend_skills?: string[] | null
           bio?: string | null
           created_at?: string
+          currently_learning?: string[] | null
+          currently_working?: string[] | null
           display_name?: string | null
           email?: string | null
           frontend_skills?: string[] | null

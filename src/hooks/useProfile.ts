@@ -18,6 +18,8 @@ export interface Profile {
   frontend_skills: string[];
   backend_skills: string[];
   other_skills: string[];
+  currently_learning: string[];
+  currently_working: string[];
   created_at: string;
   updated_at: string;
 }

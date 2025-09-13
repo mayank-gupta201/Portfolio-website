@@ -15,8 +15,10 @@ const About = () => {
     frontend: string[];
     backend: string[];
     other: string[];
-  }>({ frontend: [], backend: [], other: [] });
-  const [newSkill, setNewSkill] = useState({ frontend: '', backend: '', other: '' });
+    currentlyLearning: string[];
+    currentlyWorking: string[];
+  }>({ frontend: [], backend: [], other: [], currentlyLearning: [], currentlyWorking: [] });
+  const [newSkill, setNewSkill] = useState({ frontend: '', backend: '', other: '', currentlyLearning: '', currentlyWorking: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +37,8 @@ const About = () => {
       frontend: profile?.frontend_skills || ['React & TypeScript', 'Next.js', 'Tailwind CSS'],
       backend: profile?.backend_skills || ['Node.js', 'Python', 'PostgreSQL'],
       other: profile?.other_skills || ['Git & GitHub', 'Docker', 'AWS'],
+      currentlyLearning: profile?.currently_learning || ['Machine Learning', 'TypeScript Advanced Patterns'],
+      currentlyWorking: profile?.currently_working || ['Portfolio Website', 'E-commerce Platform'],
     });
     setIsEditing(true);
   };
@@ -46,6 +50,8 @@ const About = () => {
           frontend_skills: editingSkills.frontend,
           backend_skills: editingSkills.backend,
           other_skills: editingSkills.other,
+          currently_learning: editingSkills.currentlyLearning,
+          currently_working: editingSkills.currentlyWorking,
         });
         setIsEditing(false);
       } catch (error) {
@@ -54,7 +60,7 @@ const About = () => {
     }
   };
 
-  const addSkill = (type: 'frontend' | 'backend' | 'other') => {
+  const addSkill = (type: 'frontend' | 'backend' | 'other' | 'currentlyLearning' | 'currentlyWorking') => {
     const skill = newSkill[type].trim();
     if (skill) {
       setEditingSkills(prev => ({
@@ -65,7 +71,7 @@ const About = () => {
     }
   };
 
-  const removeSkill = (type: 'frontend' | 'backend' | 'other', index: number) => {
+  const removeSkill = (type: 'frontend' | 'backend' | 'other' | 'currentlyLearning' | 'currentlyWorking', index: number) => {
     setEditingSkills(prev => ({
       ...prev,
       [type]: prev[type].filter((_, i) => i !== index)
@@ -76,6 +82,8 @@ const About = () => {
   const frontendSkills = profile?.frontend_skills?.length ? profile.frontend_skills : ['React & TypeScript', 'Next.js', 'Tailwind CSS'];
   const backendSkills = profile?.backend_skills?.length ? profile.backend_skills : ['Node.js', 'Python', 'PostgreSQL'];
   const otherSkills = profile?.other_skills?.length ? profile.other_skills : ['Git & GitHub', 'Docker', 'AWS'];
+  const currentlyLearning = profile?.currently_learning?.length ? profile.currently_learning : ['Machine Learning', 'TypeScript Advanced Patterns'];
+  const currentlyWorking = profile?.currently_working?.length ? profile.currently_working : ['Portfolio Website', 'E-commerce Platform'];
 
   return (
     <section id="about" className="py-20 bg-muted/30">
@@ -95,8 +103,104 @@ const About = () => {
                 With a strong foundation in both frontend and backend development, 
                 I bring ideas to life through clean, efficient code and thoughtful design.
               </p>
+
+              {/* Current Activities Section */}
+              <div className="mb-8">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="font-semibold text-brand-primary">🌱 Currently Learning</h3>
+                      {user && !isEditing && (
+                        <Button size="sm" variant="ghost" onClick={handleEditSkills}>
+                          <Edit2 className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        {editingSkills.currentlyLearning.map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {item}
+                              <X 
+                                className="w-3 h-3 ml-1 cursor-pointer" 
+                                onClick={() => removeSkill('currentlyLearning', index)}
+                              />
+                            </Badge>
+                          </div>
+                        ))}
+                        <div className="flex items-center gap-2">
+                          <Input
+                            placeholder="Add learning item"
+                            value={newSkill.currentlyLearning}
+                            onChange={(e) => setNewSkill(prev => ({ ...prev, currentlyLearning: e.target.value }))}
+                            onKeyPress={(e) => e.key === 'Enter' && addSkill('currentlyLearning')}
+                          />
+                          <Button size="sm" onClick={() => addSkill('currentlyLearning')}>
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {currentlyLearning.map((item, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {item}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="font-semibold text-brand-primary">🚀 Currently Working On</h3>
+                      {user && !isEditing && (
+                        <Button size="sm" variant="ghost" onClick={handleEditSkills}>
+                          <Edit2 className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        {editingSkills.currentlyWorking.map((item, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {item}
+                              <X 
+                                className="w-3 h-3 ml-1 cursor-pointer" 
+                                onClick={() => removeSkill('currentlyWorking', index)}
+                              />
+                            </Badge>
+                          </div>
+                        ))}
+                        <div className="flex items-center gap-2">
+                          <Input
+                            placeholder="Add working item"
+                            value={newSkill.currentlyWorking}
+                            onChange={(e) => setNewSkill(prev => ({ ...prev, currentlyWorking: e.target.value }))}
+                            onKeyPress={(e) => e.key === 'Enter' && addSkill('currentlyWorking')}
+                          />
+                          <Button size="sm" onClick={() => addSkill('currentlyWorking')}>
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {currentlyWorking.map((item, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {item}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
               
-              <div className="grid grid-cols-3 gap-6">
+              {/* Skills Section */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-semibold text-brand-primary">Frontend</h3>
