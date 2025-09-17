@@ -53,33 +53,45 @@ const Certificates = () => {
           {certificates.map((certificate) => (
             <Card key={certificate.id} className="group overflow-hidden shadow-card hover:shadow-hover transition-all duration-300 border-0">
               <div className="aspect-[4/3] bg-gradient-to-br from-brand-primary/10 to-brand-secondary/10 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Award className="w-16 h-16 text-brand-primary opacity-20" />
-                </div>
-                
-                {/* Certificate preview */}
-                <div className="absolute inset-4 bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <Award className="w-8 h-8 text-brand-primary" />
-                      <Badge variant="secondary" className="text-xs">
-                        {certificate.date}
-                      </Badge>
+                {certificate.image_url ? (
+                  // Display uploaded certificate image
+                  <img 
+                    src={certificate.image_url} 
+                    alt={certificate.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  // Fallback to original design when no image
+                  <>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Award className="w-16 h-16 text-brand-primary opacity-20" />
                     </div>
-                    <h3 className="font-bold text-lg mb-2 text-foreground">
-                      {certificate.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {certificate.issuer}
-                    </p>
-                  </div>
-                  
-                  {certificate.credential_id && (
-                    <div className="text-xs text-muted-foreground">
-                      ID: {certificate.credential_id}
+                    
+                    {/* Certificate preview */}
+                    <div className="absolute inset-4 bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <Award className="w-8 h-8 text-brand-primary" />
+                          <Badge variant="secondary" className="text-xs">
+                            {certificate.date}
+                          </Badge>
+                        </div>
+                        <h3 className="font-bold text-lg mb-2 text-foreground">
+                          {certificate.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {certificate.issuer}
+                        </p>
+                      </div>
+                      
+                      {certificate.credential_id && (
+                        <div className="text-xs text-muted-foreground">
+                          ID: {certificate.credential_id}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
                 
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
